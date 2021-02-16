@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <v-list>
-      <template v-for="(item, i) in products">
+    <v-list>
+      <template v-for="(item, i) in deals">
         <v-list-item
           :key="i"
           link
@@ -10,16 +10,16 @@
         >
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
-            <v-list-item-subtitle>{{ item.price | numberComma }}원 / 배송비: {{ item.shippingFee ? item.shippingFee + '원' : '무료' | numberComma }}</v-list-item-subtitle>
+            <!-- <v-list-item-subtitle>{{ item.price | numberComma }}원 / 배송비: {{ item.shippingFee ? item.shippingFee + '원' : '무료' | numberComma }}</v-list-item-subtitle> -->
           </v-list-item-content>
         </v-list-item>
 
         <v-divider
-          v-if="i < products.length - 1"
+          v-if="i < deals.length - 1"
           :key="i"
         />
       </template>
-    </v-list> -->
+    </v-list>
 
     <v-btn @click="test">test</v-btn>
   </div>
@@ -32,15 +32,15 @@ export default {
       return String(val).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     }
   },
-  // async asyncData ({ $axios }) {
-  //   const products = await $axios.get('/api/coupang')
-  //   return {
-  //     products: products.data
-  //   }
-  // },
+  async asyncData ({ $axios }) {
+    const deals = await $axios.get('/api')
+    return {
+      deals: deals.data
+    }
+  },
   data () {
     return {
-      products: []
+      deals: []
     }
   },
   mounted () {

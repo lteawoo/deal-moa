@@ -7,7 +7,7 @@ export default app
 
 app.get('/', async (req, res, next) => {
   const ppomppu = new Ppomppu()
-  await ppomppu.parse()
+  const data = await ppomppu.parse()
 
-  res.send()
+  res.send(data)
 })

@@ -3,12 +3,15 @@ import puppeteer from 'puppeteer'
 
 export class Ppomppu {
   constructor () {
-    this.url = 'http://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu'
+    this.url = 'http://www.ppomppu.co.kr/zboard/'
+    this.paths = {
+      ppomppu: 'zboard.php?id=ppomppu'
+    }
   }
 
   async parse () {
     const browser = await puppeteer.launch({
-      headless: false
+      headless: true
     })
 
     const page = await browser.newPage()
@@ -31,7 +34,7 @@ export class Ppomppu {
     page.waitForSelector('#revolution_main_table')
       .then(() => console.log('뽐뿌 파싱완료'))
 
-    await page.goto(this.url, {
+    await page.goto(this.url + this.paths.ppomppu, {
       waitUntil: 'domcontentloaded'
     })
 
@@ -48,12 +51,16 @@ export class Ppomppu {
       const contentEl = dealEl.find('table')
 
       const aEl = contentEl.find('a')
-      console.log('==================================================================================================')
-      console.log(aEl.attr('href'))
-      console.log(cSelector(aEl[0]).html())
-      console.log(cSelector(aEl[1]).html())
+
+      returnArr.push({
+        title: cSelector(aEl[1]).text(),
+        link: this.url + aEl.attr('href'),
+        img: cSelector(aEl[0]).find('img').attr('src')
+      })
     }
 
     await browser.close()
+
+    return returnArr
   }
 }
