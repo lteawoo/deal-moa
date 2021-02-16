@@ -1,9 +1,13 @@
 import express from 'express'
+import { Ppomppu } from './targets/ppomppu'
 
 const app = express()
 
 export default app
 
-app.get('/', (req, res, next) => {
-  res.send('test')
+app.get('/', async (req, res, next) => {
+  const ppomppu = new Ppomppu()
+  await ppomppu.parse()
+
+  res.send()
 })
