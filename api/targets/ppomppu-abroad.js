@@ -5,7 +5,7 @@ export class Ppomppu {
   constructor () {
     this.url = 'http://www.ppomppu.co.kr/zboard/'
     this.paths = {
-      ppomppu: 'zboard.php?id=ppomppu'
+      ppomppu: 'zboard.php?id=ppomppu4'
     }
   }
 

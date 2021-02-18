@@ -17,11 +17,21 @@ const saveJson = (dealList) => {
   })
 }
 
-app.get('/', async (req, res, next) => {
+app.get('/parse/ppomppu', async (req, res, next) => {
   const ppomppu = new Ppomppu()
   const data = await ppomppu.parse()
 
   saveJson(data)
 
   res.send()
+})
+
+app.get('/load/ppomppu', async (req, res, next) => {
+  fs.readFile(`${BASE_DIR}/${PPOMPPU_FILE}`, (err, data) => {
+    if (err) {
+      res.send(err)
+    } else {
+      res.send(data)
+    }
+  })
 })
