@@ -39,10 +39,10 @@ export default {
   },
 
   async asyncData ({ $axios }) {
-    const ppomppu = await $axios.get('/api/load/ppomppu')
-    const ppomppu2 = await $axios.get('/api/load/ppomppu2')
+    const loadData = await $axios.get('/api/load')
+    console.log(loadData.data)
 
-    const resultArr = ppomppu.data.concat(ppomppu2.data)
+    const resultArr = loadData.data
     return {
       deals: resultArr
     }
@@ -80,8 +80,7 @@ export default {
     },
 
     async test () {
-      await this.$axios.get('/api/parse/ppomppu')
-      await this.$axios.get('/api/parse/ppomppu2')
+      await this.$axios.get('/api/parse')
     }
   }
 }

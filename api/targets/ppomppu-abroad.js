@@ -1,20 +1,13 @@
 import cheerio from 'cheerio'
-import puppeteer from 'puppeteer'
 
-export class Ppomppu2 {
+export default class ppomppuAboard {
   constructor () {
     this.category = 'ppomppu2'
     this.url = 'http://www.ppomppu.co.kr/zboard/'
-    this.paths = {
-      ppomppu: 'zboard.php?id=ppomppu4'
-    }
+    this.path = 'zboard.php?id=ppomppu4'
   }
 
-  async parse () {
-    const browser = await puppeteer.launch({
-      headless: true
-    })
-
+  async parse (browser) {
     const page = await browser.newPage()
     await page.setRequestInterception(true)
 
@@ -32,10 +25,11 @@ export class Ppomppu2 {
     })
 
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+
     page.waitForSelector('#revolution_main_table')
       .then(() => console.log('뽐뿌-해외 파싱완료'))
 
-    await page.goto(this.url + this.paths.ppomppu, {
+    await page.goto(this.url + this.path, {
       waitUntil: 'domcontentloaded'
     })
 
@@ -60,8 +54,6 @@ export class Ppomppu2 {
         img: cSelector(aEl[0]).find('img').attr('src')
       })
     }
-
-    await browser.close()
 
     return returnArr
   }
