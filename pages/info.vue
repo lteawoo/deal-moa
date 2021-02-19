@@ -39,9 +39,12 @@ export default {
   },
 
   async asyncData ({ $axios }) {
-    const deals = await $axios.get('/api/load/ppomppu')
+    const ppomppu = await $axios.get('/api/load/ppomppu')
+    const ppomppu2 = await $axios.get('/api/load/ppomppu2')
+
+    const resultArr = ppomppu.data.concat(ppomppu2.data)
     return {
-      deals: deals.data
+      deals: resultArr
     }
   },
 
@@ -49,8 +52,12 @@ export default {
     return {
       categories: [
         {
-          category: 'ppomppu1',
+          category: 'ppomppu',
           label: '뽐뿌 - 국내'
+        },
+        {
+          category: 'ppomppu2',
+          label: '뽐뿌 - 해외'
         }
       ],
       deals: []
@@ -74,6 +81,7 @@ export default {
 
     async test () {
       await this.$axios.get('/api/parse/ppomppu')
+      await this.$axios.get('/api/parse/ppomppu2')
     }
   }
 }

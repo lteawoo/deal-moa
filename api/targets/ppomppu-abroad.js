@@ -1,8 +1,9 @@
 import cheerio from 'cheerio'
 import puppeteer from 'puppeteer'
 
-export class Ppomppu {
+export class Ppomppu2 {
   constructor () {
+    this.category = 'ppomppu2'
     this.url = 'http://www.ppomppu.co.kr/zboard/'
     this.paths = {
       ppomppu: 'zboard.php?id=ppomppu4'
@@ -32,7 +33,7 @@ export class Ppomppu {
 
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
     page.waitForSelector('#revolution_main_table')
-      .then(() => console.log('뽐뿌 파싱완료'))
+      .then(() => console.log('뽐뿌-해외 파싱완료'))
 
     await page.goto(this.url + this.paths.ppomppu, {
       waitUntil: 'domcontentloaded'
@@ -53,7 +54,7 @@ export class Ppomppu {
       const aEl = contentEl.find('a')
 
       returnArr.push({
-        category: 'ppomppu1',
+        category: this.category,
         title: cSelector(aEl[1]).text(),
         link: this.url + aEl.attr('href'),
         img: cSelector(aEl[0]).find('img').attr('src')
