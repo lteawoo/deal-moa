@@ -1,15 +1,17 @@
 import fs from 'fs'
 import puppeteer from 'puppeteer'
+// import Cooln from './targets/cooln'
 import Ppomppu from './targets/ppomppu'
-import PpomppuAboard from './targets/ppomppu-abroad'
+// import PpomppuAboard from './targets/ppomppu-abroad'
 
 const BASE_DIR = 'C:/file'
 
 export default class parser {
   constructor () {
     this.targets = [
-      new Ppomppu(),
-      new PpomppuAboard()
+      new Ppomppu()
+      // new PpomppuAboard(),
+      // new Cooln()
     ]
   }
 
@@ -25,7 +27,7 @@ export default class parser {
   }
 
   loadFile (target) {
-    return JSON.parse(fs.readFileSync(`${BASE_DIR}/${target.category}.json`, 'utf8'))
+    return JSON.parse(fs.readFileSync(`${BASE_DIR}/${target.name}.json`, 'utf8'))
   }
 
   writeFiles (datas) {
@@ -36,7 +38,7 @@ export default class parser {
   }
 
   writeFile (data) {
-    fs.writeFile(`${BASE_DIR}/${data.category}.json`, JSON.stringify(data.data), (err) => {
+    fs.writeFile(`${BASE_DIR}/${data.name}.json`, JSON.stringify(data.data), (err) => {
       if (err) {
         return err
       }
@@ -53,7 +55,7 @@ export default class parser {
     for (let i = 0; i < this.targets.length; i += 1) {
       const data = await this.targets[i].parse(browser)
       resultArr.push({
-        category: this.targets[i].category,
+        name: this.targets[i].name,
         data
       })
     }

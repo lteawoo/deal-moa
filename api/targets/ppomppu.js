@@ -1,8 +1,9 @@
 import cheerio from 'cheerio'
+import dateformat from 'dateformat'
 
 export default class ppomppu {
   constructor () {
-    this.category = 'ppomppu'
+    this.name = 'ppomppu'
     this.url = 'http://www.ppomppu.co.kr/zboard/'
     this.path = 'zboard.php?id=ppomppu'
   }
@@ -43,20 +44,45 @@ export default class ppomppu {
     for (let i = 0; i < dealListEl.length; i += 1) {
       const dealEl = cSelector(dealListEl[i])
 
-      const contentEl = dealEl.find('table')
-
+      const tdEl = dealEl.children('td')
+      // 카테고리 파싱
+      const category = cSelector(tdEl[1]).text()
+      // 이미지/제목/링크 파싱
+      const contentEl = tdEl.find('table')
       const aEl = contentEl.find('a')
+      const title = cSelector(aEl[1]).text()
+      const img = cSelector(aEl[0]).find('img').attr('src')
+      const link = this.url + aEl.attr('href')
+      // 시간 파싱
+      const timeEl = cSelector(tdEl[4])
+      this.convertDate(timeEl.attr('title'))
+      console.log(timeEl.attr('title'))
+      // console.log(dateformat(timeEl.attr('title'), 'yy.mm.dd HH:MM:ss'))
 
       returnArr.push({
-        category: this.category,
-        title: cSelector(aEl[1]).text(),
-        link: this.url + aEl.attr('href'),
-        img: cSelector(aEl[0]).find('img').attr('src')
+        name: this.name,
+        category,
+        title,
+        link,
+        img
       })
     }
 
     await page.close()
 
     return returnArr
+  }
+
+  convertDate(pDate) {
+    const yy = pDate.substr(0, 2)
+    const mm = pDate.substr(3, 2)
+    const dd = pDate.substr(6, 2)
+    const HH = pDate.substr(9, 2)
+    const MM = pDate.substr(12, 2)
+    const ss = pDate.substr(15, 2)
+    const yyyy = (yy < 60) ? '20' + yy : '19'
+    console.log(yy, mm, dd, HH, MM, ss)
+    const resultDate = new Date(`${yyyy}-${mm}-${dd} ${HH}:${MM}:${ss}`)
+    console.log(resultDate, resultDate.toLocaleDateString())
   }
 }

@@ -9,7 +9,7 @@
           target="_blank"
         >
           <v-list-item-action>
-            {{ getCategoryLabel(item.category) }}
+            {{ getTargetLabel(item.name) }}
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -50,13 +50,13 @@ export default {
 
   data () {
     return {
-      categories: [
+      targets: [
         {
-          category: 'ppomppu',
+          name: 'ppomppu',
           label: '뽐뿌 - 국내'
         },
         {
-          category: 'ppomppu2',
+          name: 'ppomppu2',
           label: '뽐뿌 - 해외'
         }
       ],
@@ -67,16 +67,16 @@ export default {
   },
 
   methods: {
-    getCategoryLabel (category) {
-      for (let i = 0; i < this.categories.length; i += 1) {
-        const item = this.categories[i]
+    getTargetLabel (name) {
+      for (let i = 0; i < this.targets.length; i += 1) {
+        const item = this.targets[i]
 
-        if (item.category === category) {
+        if (item.name === name) {
           return item.label
         }
       }
 
-      return category
+      return name
     },
 
     async test () {

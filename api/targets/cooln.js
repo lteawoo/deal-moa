@@ -1,10 +1,10 @@
 import cheerio from 'cheerio'
 
-export default class ppomppuAboard {
+export default class cooln {
   constructor () {
-    this.name = 'ppomppu2'
-    this.url = 'http://www.ppomppu.co.kr/zboard/'
-    this.path = 'zboard.php?id=ppomppu4'
+    this.name = 'cooln'
+    this.url = 'https://coolenjoy.net/'
+    this.path = 'bbs/jirum'
   }
 
   async parse (browser) {
@@ -26,8 +26,8 @@ export default class ppomppuAboard {
 
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
 
-    page.waitForSelector('#revolution_main_table')
-      .then(() => console.log('뽐뿌-해외 파싱완료'))
+    page.waitForSelector('#fboardlist')
+      .then(() => console.log('쿨엔 파싱완료'))
 
     await page.goto(this.url + this.path, {
       waitUntil: 'domcontentloaded'
@@ -35,25 +35,26 @@ export default class ppomppuAboard {
 
     const pageContent = await page.content()
     const cSelector = cheerio.load(pageContent)
-    // 공지사항 제거
-    const dealListEl = cSelector('#revolution_main_table tbody tr:not([class*="list_notice"])[class^="list"]')
+    // 공지사항 제거-1: class bo_notice 제거
+    const dealListEl = cSelector('#fboardlist tbody tr:not([class*="bo_notice"])')
 
     const returnArr = []
 
     for (let i = 0; i < dealListEl.length; i += 1) {
       const dealEl = cSelector(dealListEl[i])
 
-      const contentEl = dealEl.find('table')
+      const tdNum = cSelector(dealEl).find('.td_num')
+      console.log(tdNum.html())
 
-      const aEl = contentEl.find('a')
-
-      returnArr.push({
-        name: this.name,
-        title: cSelector(aEl[1]).text(),
-        link: this.url + aEl.attr('href'),
-        img: cSelector(aEl[0]).find('img').attr('src')
-      })
+      // returnArr.push({
+      //   name: this.name,
+      //   title: cSelector(aEl[1]).text(),
+      //   link: this.url + aEl.attr('href'),
+      //   img: cSelector(aEl[0]).find('img').attr('src')
+      // })
     }
+
+    await page.close()
 
     return returnArr
   }
