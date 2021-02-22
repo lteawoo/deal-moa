@@ -1,5 +1,4 @@
 import cheerio from 'cheerio'
-import dateformat from 'dateformat'
 
 export default class ppomppu {
   constructor () {
@@ -55,16 +54,13 @@ export default class ppomppu {
       const link = this.url + aEl.attr('href')
       // 시간 파싱
       const timeEl = cSelector(tdEl[4])
-      this.convertDate(timeEl.attr('title'))
-      console.log(timeEl.attr('title'))
-      // console.log(dateformat(timeEl.attr('title'), 'yy.mm.dd HH:MM:ss'))
-
       returnArr.push({
         name: this.name,
         category,
         title,
         link,
-        img
+        img,
+        regDt: this.convertDate(timeEl.attr('title'))
       })
     }
 
@@ -81,8 +77,7 @@ export default class ppomppu {
     const MM = pDate.substr(12, 2)
     const ss = pDate.substr(15, 2)
     const yyyy = (yy < 60) ? '20' + yy : '19'
-    console.log(yy, mm, dd, HH, MM, ss)
-    const resultDate = new Date(`${yyyy}-${mm}-${dd} ${HH}:${MM}:${ss}`)
-    console.log(resultDate, resultDate.toLocaleDateString())
+    const resultDate = new Date(`${yyyy}-${mm}-${dd}T${HH}:${MM}:${ss}`)
+    return resultDate
   }
 }

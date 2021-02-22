@@ -13,6 +13,7 @@
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <v-list-item-subtitle>{{ item.category }} | {{ item.regDt | localeDateTime }}</v-list-item-subtitle>
             <!-- <v-list-item-subtitle>{{ item.price | numberComma }}원 / 배송비: {{ item.shippingFee ? item.shippingFee + '원' : '무료' | numberComma }}</v-list-item-subtitle> -->
           </v-list-item-content>
         </v-list-item>
@@ -31,10 +32,16 @@
 </template>
 
 <script>
+import dateformat from 'dateformat'
+
 export default {
   filters: {
     numberComma (val) {
       return String(val).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    },
+
+    localeDateTime (dt) {
+      return dateformat(dt, 'yyyy-mm-dd HH:MM:ss')
     }
   },
 
