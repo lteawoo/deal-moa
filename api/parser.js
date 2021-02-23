@@ -1,17 +1,17 @@
 import fs from 'fs'
 import puppeteer from 'puppeteer'
-// import Cooln from './targets/cooln'
-import Ppomppu from './targets/ppomppu'
-import PpomppuAboard from './targets/ppomppu-abroad'
+import Cooln from './targets/cooln'
+// import Ppomppu from './targets/ppomppu'
+// import PpomppuAboard from './targets/ppomppu-abroad'
 
 const BASE_DIR = 'C:/file'
 
 export default class parser {
   constructor () {
     this.targets = [
-      new Ppomppu(),
-      new PpomppuAboard()
-      // new Cooln()
+      // new Ppomppu(),
+      // new PpomppuAboard()
+      new Cooln()
     ]
   }
 

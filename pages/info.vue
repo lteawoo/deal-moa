@@ -55,7 +55,13 @@ export default {
       })
 
       return acc.concat(remap)
-    }, []).sort((a, b) => a.regDt - b.regDt)
+    }, []).sort((a, b) => {
+      if (a.regDt > b.regDt) {
+        return -1
+      } else {
+        return 1
+      }
+    })
 
     return {
       deals: resultArr

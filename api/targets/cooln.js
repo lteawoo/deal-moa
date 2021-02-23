@@ -3,6 +3,7 @@ import cheerio from 'cheerio'
 export default class cooln {
   constructor () {
     this.name = 'cooln'
+    this.label = '쿨엔'
     this.url = 'https://coolenjoy.net/'
     this.path = 'bbs/jirum'
   }
@@ -42,9 +43,21 @@ export default class cooln {
 
     for (let i = 0; i < dealListEl.length; i += 1) {
       const dealEl = cSelector(dealListEl[i])
-
-      const tdNum = cSelector(dealEl).find('.td_num')
-      console.log(tdNum.html())
+      const tdEl = dealEl.children('td')
+      const tdNum = cSelector(tdEl).filter('.td_num')
+      // 카테고리 파싱
+      const category = tdNum.text().trim()
+      console.log(category)
+      if (!category) {
+        continue
+      }
+      // 이미지/제목/링크 파싱
+      const tdSubject = cSelector(tdEl).filter('.td_subject')
+      tdSubject.find('a span').remove()
+      const title = tdSubject.children('a').text().trim()
+      console.log(title)
+      const link = tdSubject.find('a').attr('href')
+      console.log(link)
 
       // returnArr.push({
       //   name: this.name,
