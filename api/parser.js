@@ -2,15 +2,15 @@ import fs from 'fs'
 import puppeteer from 'puppeteer'
 // import Cooln from './targets/cooln'
 import Ppomppu from './targets/ppomppu'
-// import PpomppuAboard from './targets/ppomppu-abroad'
+import PpomppuAboard from './targets/ppomppu-abroad'
 
 const BASE_DIR = 'C:/file'
 
 export default class parser {
   constructor () {
     this.targets = [
-      new Ppomppu()
-      // new PpomppuAboard(),
+      new Ppomppu(),
+      new PpomppuAboard()
       // new Cooln()
     ]
   }
@@ -38,7 +38,7 @@ export default class parser {
   }
 
   writeFile (data) {
-    fs.writeFile(`${BASE_DIR}/${data.name}.json`, JSON.stringify(data.data), (err) => {
+    fs.writeFile(`${BASE_DIR}/${data.name}.json`, JSON.stringify(data), (err) => {
       if (err) {
         return err
       }
@@ -54,10 +54,7 @@ export default class parser {
 
     for (let i = 0; i < this.targets.length; i += 1) {
       const data = await this.targets[i].parse(browser)
-      resultArr.push({
-        name: this.targets[i].name,
-        data
-      })
+      resultArr.push(data)
     }
 
     await browser.close()

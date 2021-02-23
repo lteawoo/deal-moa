@@ -3,6 +3,7 @@ import cheerio from 'cheerio'
 export default class ppomppuAboard {
   constructor () {
     this.name = 'ppomppu2'
+    this.label = '뽐뿌-해외'
     this.url = 'http://www.ppomppu.co.kr/zboard/'
     this.path = 'zboard.php?id=ppomppu4'
   }
@@ -27,7 +28,7 @@ export default class ppomppuAboard {
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
 
     page.waitForSelector('#revolution_main_table')
-      .then(() => console.log('뽐뿌-해외 파싱완료'))
+      .then(() => console.log('뽐뿌-국내 파싱완료'))
 
     await page.goto(this.url + this.path, {
       waitUntil: 'domcontentloaded'
@@ -43,18 +44,44 @@ export default class ppomppuAboard {
     for (let i = 0; i < dealListEl.length; i += 1) {
       const dealEl = cSelector(dealListEl[i])
 
-      const contentEl = dealEl.find('table')
-
+      const tdEl = dealEl.children('td')
+      // 카테고리 파싱
+      const category = cSelector(tdEl[1]).text()
+      // 이미지/제목/링크 파싱
+      const contentEl = tdEl.find('table')
       const aEl = contentEl.find('a')
-
+      const title = cSelector(aEl[1]).text()
+      const img = cSelector(aEl[0]).find('img').attr('src')
+      const link = this.url + aEl.attr('href')
+      // 시간 파싱
+      const timeEl = cSelector(tdEl[4])
       returnArr.push({
-        name: this.name,
-        title: cSelector(aEl[1]).text(),
-        link: this.url + aEl.attr('href'),
-        img: cSelector(aEl[0]).find('img').attr('src')
+        category,
+        title,
+        link,
+        img,
+        regDt: this.convertDate(timeEl.attr('title'))
       })
     }
 
-    return returnArr
+    await page.close()
+
+    return {
+      name: this.name,
+      label: this.label,
+      data: returnArr
+    }
+  }
+
+  convertDate (pDate) {
+    const yy = pDate.substr(0, 2)
+    const mm = pDate.substr(3, 2)
+    const dd = pDate.substr(6, 2)
+    const HH = pDate.substr(9, 2)
+    const MM = pDate.substr(12, 2)
+    const ss = pDate.substr(15, 2)
+    const yyyy = (yy < 60) ? '20' + yy : '19'
+    const resultDate = new Date(`${yyyy}-${mm}-${dd}T${HH}:${MM}:${ss}`)
+    return resultDate
   }
 }

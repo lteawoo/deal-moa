@@ -3,6 +3,7 @@ import cheerio from 'cheerio'
 export default class ppomppu {
   constructor () {
     this.name = 'ppomppu'
+    this.label = '뽐뿌-국내'
     this.url = 'http://www.ppomppu.co.kr/zboard/'
     this.path = 'zboard.php?id=ppomppu'
   }
@@ -55,7 +56,6 @@ export default class ppomppu {
       // 시간 파싱
       const timeEl = cSelector(tdEl[4])
       returnArr.push({
-        name: this.name,
         category,
         title,
         link,
@@ -66,10 +66,14 @@ export default class ppomppu {
 
     await page.close()
 
-    return returnArr
+    return {
+      name: this.name,
+      label: this.label,
+      data: returnArr
+    }
   }
 
-  convertDate(pDate) {
+  convertDate (pDate) {
     const yy = pDate.substr(0, 2)
     const mm = pDate.substr(3, 2)
     const dd = pDate.substr(6, 2)
