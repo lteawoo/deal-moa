@@ -7,8 +7,9 @@ export default app
 
 app.get('/parse', async (req, res, next) => {
   const parser = new Parser()
-  const data = await parser.parse()
-  parser.writeFiles(data)
+  // const data = await parser.parse()
+  await parser.parseRss()
+  // parser.writeFiles(data)
 
   res.send()
 })

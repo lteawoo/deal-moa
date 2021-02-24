@@ -1,5 +1,6 @@
 import fs from 'fs'
 import puppeteer from 'puppeteer'
+import RssParser from 'rss-parser'
 import Cooln from './targets/cooln'
 // import Ppomppu from './targets/ppomppu'
 // import PpomppuAboard from './targets/ppomppu-abroad'
@@ -60,5 +61,19 @@ export default class parser {
     await browser.close()
 
     return resultArr
+  }
+
+  async parseRss () {
+    const rssParser = new RssParser({
+      item: [
+        ['dc:date', 'date']
+      ]
+    })
+    const feed = await rssParser.parseURL('https://coolenjoy.net/rss?bo_table=jirum')
+
+    feed.items.forEach((item) => {
+      console.log(item.title + ':' + item.link)
+      console.log(item.date)
+    })
   }
 }
