@@ -1,17 +1,18 @@
 import fs from 'fs'
 import puppeteer from 'puppeteer'
-import RssParser from 'rss-parser'
 import Cooln from './targets/cooln'
-// import Ppomppu from './targets/ppomppu'
-// import PpomppuAboard from './targets/ppomppu-abroad'
+import Ppomppu from './targets/ppomppu'
+import PpomppuAboard from './targets/ppomppu-abroad'
 
 const BASE_DIR = 'C:/file'
 
 export default class parser {
   constructor () {
     this.targets = [
-      // new Ppomppu(),
-      // new PpomppuAboard()
+      new Ppomppu(),
+      new PpomppuAboard()
+    ]
+    this.rssTargets = [
       new Cooln()
     ]
   }
@@ -34,6 +35,7 @@ export default class parser {
   writeFiles (datas) {
     for (let i = 0; i < datas.length; i += 1) {
       const data = datas[i]
+      console.log(data)
       this.writeFile(data)
     }
   }
@@ -64,16 +66,13 @@ export default class parser {
   }
 
   async parseRss () {
-    const rssParser = new RssParser({
-      item: [
-        ['dc:date', 'date']
-      ]
-    })
-    const feed = await rssParser.parseURL('https://coolenjoy.net/rss?bo_table=jirum')
+    const resultArr = []
 
-    feed.items.forEach((item) => {
-      console.log(item.title + ':' + item.link)
-      console.log(item.date)
-    })
+    for (let i = 0; i < this.rssTargets.length; i += 1) {
+      const data = await this.rssTargets[i].parseRss()
+      resultArr.push(data)
+    }
+
+    return resultArr
   }
 }
