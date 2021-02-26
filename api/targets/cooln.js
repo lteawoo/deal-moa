@@ -9,12 +9,10 @@ export default class cooln {
   }
 
   async parseRss () {
-    const rssParser = new RssParser({
-      item: [
-        ['dc:date', 'regDt']
-      ]
+    const rssParser = new RssParser()
+    const feed = await rssParser.parseURL('https://coolenjoy.net/rss?bo_table=jirum', () => {
+      console.log('쿨엔 파싱완료')
     })
-    const feed = await rssParser.parseURL('https://coolenjoy.net/rss?bo_table=jirum')
 
     const returnArr = []
     feed.items.forEach((item) => {
@@ -23,7 +21,7 @@ export default class cooln {
         title: item.title,
         link: item.link,
         img: '',
-        regDt: item.regDt
+        regDt: this.convertDate(item.date)
       })
     })
 
@@ -32,6 +30,10 @@ export default class cooln {
       label: this.label,
       data: returnArr
     }
+  }
+
+  convertDate (pDate) {
+    return new Date(pDate)
   }
 
   // async parse (browser) {

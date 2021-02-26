@@ -25,6 +25,11 @@ export default class parser {
       resultArr = resultArr.concat(jsonData)
     }
 
+    for (let i = 0; i < this.rssTargets.length; i += 1) {
+      const jsonData = this.loadFile(this.rssTargets[i])
+      resultArr = resultArr.concat(jsonData)
+    }
+
     return resultArr
   }
 
@@ -35,7 +40,6 @@ export default class parser {
   writeFiles (datas) {
     for (let i = 0; i < datas.length; i += 1) {
       const data = datas[i]
-      console.log(data)
       this.writeFile(data)
     }
   }

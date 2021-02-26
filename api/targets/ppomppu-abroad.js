@@ -28,7 +28,7 @@ export default class ppomppuAboard {
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
 
     page.waitForSelector('#revolution_main_table')
-      .then(() => console.log('뽐뿌-국내 파싱완료'))
+      .then(() => console.log('뽐뿌-해외 파싱완료'))
 
     await page.goto(this.url + this.path, {
       waitUntil: 'domcontentloaded'
