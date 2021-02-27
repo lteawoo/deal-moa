@@ -54,7 +54,7 @@ export default class parser {
 
   async parse () {
     const browser = await puppeteer.launch({
-      headless: false
+      headless: true
     })
 
     const resultArr = []

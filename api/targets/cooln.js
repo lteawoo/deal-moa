@@ -10,10 +10,10 @@ export default class cooln {
 
   async parseRss () {
     const rssParser = new RssParser()
-    const feed = await rssParser.parseURL('https://coolenjoy.net/rss?bo_table=jirum', () => {
-      console.log('쿨엔 파싱완료')
-    })
-
+    const feed = await rssParser.parseURL('https://coolenjoy.net/rss?bo_table=jirum')
+    if (feed) {
+      console.log('쿨엔 파싱 완료')
+    }
     const returnArr = []
     feed.items.forEach((item) => {
       returnArr.push({
