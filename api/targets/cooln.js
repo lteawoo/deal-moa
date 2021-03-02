@@ -16,10 +16,11 @@ export default class cooln {
     }
     const returnArr = []
     feed.items.forEach((item) => {
+      const link = item.link.replace('amp;', '')
       returnArr.push({
         category: 'category',
         title: item.title,
-        link: item.link,
+        link,
         img: '',
         regDt: this.convertDate(item.date)
       })
