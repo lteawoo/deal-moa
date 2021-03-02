@@ -18,7 +18,7 @@ export default class cooln {
     feed.items.forEach((item) => {
       const link = item.link.replace('amp;', '')
       returnArr.push({
-        category: 'category',
+        category: '-',
         title: item.title,
         link,
         img: '',

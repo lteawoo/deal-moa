@@ -1,7 +1,13 @@
 <template>
   <div>
     <v-list>
-      <template v-for="(item, i) in deals">
+      <v-data-table
+        :headers="headers"
+        :items="deals"
+        @click:row="openDeal"
+        class="elevation-1"
+      />
+      <!-- <template v-for="(item, i) in deals">
         <v-list-item
           :key="i"
           link
@@ -21,7 +27,7 @@
           v-if="i < deals.length - 1"
           :key="'a' + i"
         />
-      </template>
+      </template> -->
     </v-list>
 
     <v-btn @click="test">
@@ -70,6 +76,36 @@ export default {
 
   data () {
     return {
+      headers: [
+        {
+          text: '사이트',
+          value: 'label',
+          sortable: false,
+          width: '100',
+          divider: true
+        },
+        {
+          text: '분류',
+          value: 'category',
+          sortable: false,
+          width: '100',
+          divider: true
+        },
+        {
+          text: '딜',
+          value: 'title',
+          sortable: false,
+          width: '100%',
+          divider: true
+        },
+        {
+          text: '등록일',
+          value: 'regDt',
+          sortable: false,
+          width: '100',
+          divider: true
+        }
+      ],
       deals: []
     }
   },
@@ -81,6 +117,10 @@ export default {
   },
 
   methods: {
+    openDeal (data) {
+      window.open(data.link, '_blank')
+    },
+
     async test () {
       await this.$axios.get('/api/parse')
     }
