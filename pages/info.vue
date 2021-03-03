@@ -4,9 +4,13 @@
       <v-data-table
         :headers="headers"
         :items="deals"
-        @click:row="openDeal"
         class="elevation-1"
-      />
+        @click:row="openDeal"
+      >
+        <template #[`item.regDt`]="{ item }">
+          <display-time :time="item.regDt" />
+        </template>
+      </v-data-table>
       <!-- <template v-for="(item, i) in deals">
         <v-list-item
           :key="i"
@@ -38,8 +42,13 @@
 
 <script>
 import dateformat from 'dateformat'
+import displayTime from '@/components/display-time'
 
 export default {
+  components: {
+    displayTime
+  },
+
   filters: {
     numberComma (val) {
       return String(val).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -103,7 +112,8 @@ export default {
           value: 'regDt',
           sortable: false,
           width: '100',
-          divider: true
+          divider: true,
+          align: 'center'
         }
       ],
       deals: []
