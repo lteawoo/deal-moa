@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer'
 import Cooln from './targets/cooln'
 import Ppomppu from './targets/ppomppu'
 import PpomppuAboard from './targets/ppomppu-abroad'
+import Quasarzone from './targets/quasarzone'
 
 const BASE_DIR = 'C:/file'
 
@@ -10,7 +11,8 @@ export default class parser {
   constructor () {
     this.targets = [
       new Ppomppu(),
-      new PpomppuAboard()
+      new PpomppuAboard(),
+      new Quasarzone()
     ]
     this.rssTargets = [
       new Cooln()
