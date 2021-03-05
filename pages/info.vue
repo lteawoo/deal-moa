@@ -7,6 +7,15 @@
         class="elevation-1"
         @click:row="openDeal"
       >
+        <template #[`item.title`]="{ item }">
+          <v-layout align-center class="pt-2 pb-2">
+            <v-img v-if="item.img" :src="item.img" max-width="75px" height="75px" class="mr-2" />
+            <v-responsive v-else max-width="75px" height="75px" class="text-center align-center">
+              <span>No img</span>
+            </v-responsive>
+            <span>{{ item.title }}</span>
+          </v-layout>
+        </template>
         <template #[`item.regDt`]="{ item }">
           <display-time :time="item.regDt" />
         </template>
@@ -97,8 +106,9 @@ export default {
           text: '분류',
           value: 'category',
           sortable: false,
-          width: '100',
-          divider: true
+          width: '120',
+          divider: true,
+          align: 'center'
         },
         {
           text: '딜',
