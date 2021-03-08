@@ -7,40 +7,16 @@
         class="elevation-1"
         @click:row="openDeal"
       >
-        <template #[`item.title`]="{ item }">
-          <v-layout align-center class="pt-2 pb-2">
-            <v-img v-if="item.img" :src="item.img" max-width="75px" height="75px" class="mr-2" />
-            <v-responsive v-else max-width="75px" height="75px" class="text-center align-center">
-              <span>No img</span>
-            </v-responsive>
-            <span>{{ item.title }}</span>
-          </v-layout>
+        <template #[`item.img`]="{ item }">
+          <v-img v-if="item.img" :src="item.img" width="75px" height="75px" class="mr-2" />
+          <v-responsive v-else width="75px" height="75px" class="text-center align-center">
+            <span>No img</span>
+          </v-responsive>
         </template>
         <template #[`item.regDt`]="{ item }">
           <display-time :time="item.regDt" />
         </template>
       </v-data-table>
-      <!-- <template v-for="(item, i) in deals">
-        <v-list-item
-          :key="i"
-          link
-          :href="item.link"
-          target="_blank"
-        >
-          <v-list-item-action>
-            {{ item.label }}
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-            <v-list-item-subtitle>{{ item.category }} | {{ item.regDt | localeDateTime }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-divider
-          v-if="i < deals.length - 1"
-          :key="'a' + i"
-        />
-      </template> -->
     </v-list>
 
     <v-btn @click="test">
@@ -100,7 +76,8 @@ export default {
           value: 'label',
           sortable: false,
           width: '100',
-          divider: true
+          divider: true,
+          align: 'center'
         },
         {
           text: '분류',
@@ -108,6 +85,14 @@ export default {
           sortable: false,
           width: '120',
           divider: true,
+          align: 'center'
+        },
+        {
+          text: '이미지',
+          value: 'img',
+          sortable: false,
+          width: '75',
+          divider: false,
           align: 'center'
         },
         {

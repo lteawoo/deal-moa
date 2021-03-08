@@ -4,8 +4,8 @@ export default class quasarzone {
   constructor () {
     this.name = 'quasarzone'
     this.label = '퀘이사존'
-    this.url = 'https://quasarzone.com/bbs/'
-    this.path = 'qb_saleinfo'
+    this.url = 'https://quasarzone.com'
+    this.path = '/bbs/qb_saleinfo'
   }
 
   async parse (browser) {
@@ -54,7 +54,7 @@ export default class quasarzone {
       const aEl = cSelector(mainEl).find('a')
       const title = cSelector(aEl).children('span').first().text()
 
-      const link = cSelector(aEl).attr('href')
+      const link = this.url + cSelector(aEl).attr('href')
 
       const subEl = cSelector(tdEl).find('.market-info-sub')
       // 카테고리 파싱
