@@ -1,23 +1,28 @@
 <template>
   <div>
-    <v-list>
-      <v-data-table
-        :headers="headers"
-        :items="deals"
-        class="elevation-1"
-        @click:row="openDeal"
-      >
-        <template #[`item.img`]="{ item }">
-          <v-img v-if="item.img" :src="item.img" width="75px" height="75px" class="mr-2" />
-          <v-responsive v-else width="75px" height="75px" class="text-center align-center">
-            <span>No img</span>
-          </v-responsive>
-        </template>
-        <template #[`item.regDt`]="{ item }">
-          <display-time :time="item.regDt" />
-        </template>
-      </v-data-table>
-    </v-list>
+    <v-data-table
+      :headers="headers"
+      :items="deals"
+      :search="search"
+      class="elevation-1"
+      @click:row="openDeal"
+    >
+      <template #top>
+        <v-text-field
+          v-model="search"
+          label="Search"
+        />
+      </template>
+      <template #[`item.img`]="{ item }">
+        <v-img v-if="item.img" :src="item.img" width="75px" height="75px" class="mr-2" />
+        <v-responsive v-else width="75px" height="75px" class="text-center align-center">
+          <span>No img</span>
+        </v-responsive>
+      </template>
+      <template #[`item.regDt`]="{ item }">
+        <display-time :time="item.regDt" />
+      </template>
+    </v-data-table>
 
     <v-btn @click="test">
       test
@@ -70,6 +75,7 @@ export default {
 
   data () {
     return {
+      search: '',
       headers: [
         {
           text: '사이트',

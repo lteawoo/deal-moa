@@ -16,5 +16,6 @@ app.get('/parse', async (req, res, next) => {
 
 app.get('/load', (req, res, next) => {
   const parser = new Parser()
+
   res.send(parser.loadFiles())
 })
