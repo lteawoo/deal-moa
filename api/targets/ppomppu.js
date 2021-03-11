@@ -16,7 +16,7 @@ export default class ppomppu {
       switch (req.resourceType()) {
         case 'stylesheet':
         case 'font':
-        case 'image':
+        // case 'image':
           req.abort()
           break
         default:
@@ -59,7 +59,7 @@ export default class ppomppu {
         category,
         title,
         link,
-        img,
+        img: img.includes('noimage') ? null : img,
         regDt: this.convertDate(timeEl.attr('title'))
       })
     }
