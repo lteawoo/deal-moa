@@ -19,24 +19,32 @@ export default class parser {
     ]
   }
 
-  loadFiles () {
+  async loadFiles () {
     let resultArr = []
 
     for (let i = 0; i < this.targets.length; i += 1) {
-      const jsonData = this.loadFile(this.targets[i])
-      resultArr = resultArr.concat(jsonData)
+      const jsonData = await this.loadFile(this.targets[i])
+      if (jsonData) {
+        resultArr = resultArr.concat(jsonData)
+      }
     }
 
     for (let i = 0; i < this.rssTargets.length; i += 1) {
-      const jsonData = this.loadFile(this.rssTargets[i])
-      resultArr = resultArr.concat(jsonData)
+      const jsonData = await this.loadFile(this.rssTargets[i])
+      if (jsonData) {
+        resultArr = resultArr.concat(jsonData)
+      }
     }
 
     return resultArr
   }
 
-  loadFile (target) {
-    return JSON.parse(fs.readFileSync(`${BASE_DIR}/${target.name}.json`, 'utf8'))
+  async loadFile (target) {
+    try {
+      return await JSON.parse(fs.readFileSync(`${BASE_DIR}/${target.name}.json`, 'utf8'))
+    } catch (e) {
+      console.error('파일이 없음: ', target.name)
+    }
   }
 
   writeFiles (datas) {
@@ -46,7 +54,30 @@ export default class parser {
     }
   }
 
-  writeFile (data) {
+  async writeFile (data) {
+    const prev = await this.loadFile(data)
+    if (prev) {
+      const prevDataList = prev.data
+      const newDataList = data.data
+      const totalCnt = prevDataList.length
+
+      for (let i = 0; i < prevDataList.length; i += 1) {
+        const prevData = prevDataList[i]
+
+        for (let j = 0; j < newDataList.length; j += 1) {
+          const newData = newDataList[j]
+          if (newData.link === prevData.link) {
+            prevDataList[i] = newDataList.splice(j, 1)[0]
+            break
+          }
+        }
+      }
+
+      const updateDataCnt = newDataList.length
+      data.data = newDataList.concat(prevDataList)
+      console.log('name: ' + data.name, 'total: ' + totalCnt, 'update: ' + updateDataCnt)
+    }
+
     fs.writeFile(`${BASE_DIR}/${data.name}.json`, JSON.stringify(data), (err) => {
       if (err) {
         return err

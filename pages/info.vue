@@ -13,12 +13,12 @@
           label="Search"
         />
       </template>
-      <template #[`item.img`]="{ item }">
+      <!-- <template #[`item.img`]="{ item }">
         <v-img v-if="item.img" :src="item.img" width="75px" height="75px" class="mr-2" />
         <v-responsive v-else width="75px" height="75px" class="text-center align-center">
           <span>No img</span>
         </v-responsive>
-      </template>
+      </template> -->
       <template #[`item.regDt`]="{ item }">
         <display-time :time="item.regDt" />
       </template>
@@ -51,25 +51,26 @@ export default {
 
   async asyncData ({ $axios }) {
     const loadData = await $axios.get('/api/load')
+    if (loadData) {
+      const resultArr = loadData.data.reduce((acc, cur) => {
+        const remap = cur.data.map((item) => {
+          item.name = cur.name
+          item.label = cur.label
+          return item
+        })
 
-    const resultArr = loadData.data.reduce((acc, cur) => {
-      const remap = cur.data.map((item) => {
-        item.name = cur.name
-        item.label = cur.label
-        return item
+        return acc.concat(remap)
+      }, []).sort((a, b) => {
+        if (a.regDt > b.regDt) {
+          return -1
+        } else {
+          return 1
+        }
       })
 
-      return acc.concat(remap)
-    }, []).sort((a, b) => {
-      if (a.regDt > b.regDt) {
-        return -1
-      } else {
-        return 1
+      return {
+        deals: resultArr
       }
-    })
-
-    return {
-      deals: resultArr
     }
   },
 
@@ -93,14 +94,14 @@ export default {
           divider: true,
           align: 'center'
         },
-        {
-          text: '이미지',
-          value: 'img',
-          sortable: false,
-          width: '75',
-          divider: false,
-          align: 'center'
-        },
+        // {
+        //   text: '이미지',
+        //   value: 'img',
+        //   sortable: false,
+        //   width: '75',
+        //   divider: false,
+        //   align: 'center'
+        // },
         {
           text: '딜',
           value: 'title',
