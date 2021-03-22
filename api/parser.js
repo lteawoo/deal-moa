@@ -19,6 +19,34 @@ export default class parser {
     ]
   }
 
+  async parse () {
+    const browser = await puppeteer.launch({
+      headless: true
+    })
+
+    const resultArr = []
+
+    for (let i = 0; i < this.targets.length; i += 1) {
+      const data = await this.targets[i].parse(browser)
+      resultArr.push(data)
+    }
+
+    await browser.close()
+
+    return resultArr
+  }
+
+  async parseRss () {
+    const resultArr = []
+
+    for (let i = 0; i < this.rssTargets.length; i += 1) {
+      const data = await this.rssTargets[i].parseRss()
+      resultArr.push(data)
+    }
+
+    return resultArr
+  }
+
   async loadFiles () {
     let resultArr = []
 
@@ -47,10 +75,9 @@ export default class parser {
     }
   }
 
-  writeFiles (datas) {
+  async writeFiles (datas) {
     for (let i = 0; i < datas.length; i += 1) {
-      const data = datas[i]
-      this.writeFile(data)
+      await this.writeFile(datas[i])
     }
   }
 
@@ -83,33 +110,5 @@ export default class parser {
         return err
       }
     })
-  }
-
-  async parse () {
-    const browser = await puppeteer.launch({
-      headless: true
-    })
-
-    const resultArr = []
-
-    for (let i = 0; i < this.targets.length; i += 1) {
-      const data = await this.targets[i].parse(browser)
-      resultArr.push(data)
-    }
-
-    await browser.close()
-
-    return resultArr
-  }
-
-  async parseRss () {
-    const resultArr = []
-
-    for (let i = 0; i < this.rssTargets.length; i += 1) {
-      const data = await this.rssTargets[i].parseRss()
-      resultArr.push(data)
-    }
-
-    return resultArr
   }
 }
