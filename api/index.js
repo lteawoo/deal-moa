@@ -33,3 +33,26 @@ app.get('/parse', async (req, res, next) => {
 app.get('/load', async (req, res, next) => {
   res.send(await parser.loadFiles())
 })
+
+app.get('/sites', (req, res, next) => {
+  const sites = [
+    {
+      code: 'ppomppu',
+      name: '뽐뿌-국내'
+    },
+    {
+      code: 'ppomppu-aboard',
+      name: '뽐뿌-해외'
+    },
+    {
+      code: 'cooln',
+      name: '쿨엔조이'
+    },
+    {
+      code: 'quasarzone',
+      name: '퀘이사존'
+    }
+  ]
+
+  res.send(sites)
+})

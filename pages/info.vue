@@ -1,32 +1,52 @@
 <template>
   <div>
-    <v-data-table
-      :headers="headers"
-      :items="deals"
-      :search="search"
-      class="elevation-1"
-      @click:row="openDeal"
-    >
-      <template #top>
-        <v-text-field
-          v-model="search"
-          label="Search"
-        />
-      </template>
-      <!-- <template #[`item.img`]="{ item }">
-        <v-img v-if="item.img" :src="item.img" width="75px" height="75px" class="mr-2" />
-        <v-responsive v-else width="75px" height="75px" class="text-center align-center">
-          <span>No img</span>
-        </v-responsive>
-      </template> -->
-      <template #[`item.regDt`]="{ item }">
-        <display-time :time="item.regDt" />
-      </template>
-    </v-data-table>
+    <v-card class="mb-5" :disabled="loading">
+      <v-card-text>
+        <v-row>
+          <v-col
+            cols="12"
+          >
+            <v-autocomplete
+              v-model="selectSites"
+              :items="sites"
+              item-text="name"
+              item-value="code"
+              label="사이트"
+              multiple
+            />
+          </v-col>
+          <v-col
+            cols="12"
+          >
+            <v-text-field
+              v-model="search"
+              label="검색"
+            />
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
 
-    <v-btn @click="test">
-      test
-    </v-btn>
+    <v-card>
+      <v-skeleton-loader
+        :loading="loading"
+        type="table"
+        tile
+      >
+        <v-data-table
+          items-per-page="30"
+          :headers="headers"
+          :items="deals"
+          :search="search"
+          class="elevation-1"
+          @click:row="openDeal"
+        >
+          <template #[`item.regDt`]="{ item }">
+            <display-time :time="item.regDt" />
+          </template>
+        </v-data-table>
+      </v-skeleton-loader>
+    </v-card>
   </div>
 </template>
 
@@ -50,9 +70,11 @@ export default {
   },
 
   async asyncData ({ $axios }) {
-    const loadData = await $axios.get('/api/load')
-    if (loadData) {
-      const resultArr = loadData.data.reduce((acc, cur) => {
+    const result = {}
+
+    const dealsData = await $axios.get('/api/load')
+    if (dealsData) {
+      const resultArr = dealsData.data.reduce((acc, cur) => {
         const remap = cur.data.map((item) => {
           item.name = cur.name
           item.label = cur.label
@@ -68,15 +90,23 @@ export default {
         }
       })
 
-      return {
-        deals: resultArr
-      }
+      result.deals = resultArr
     }
+
+    const sitesData = await $axios.get('/api/sites')
+    if (sitesData) {
+      result.sites = sitesData.data
+    }
+
+    return result
   },
 
   data () {
     return {
+      loading: true,
       search: '',
+      sites: [],
+      selectSites: null,
       headers: [
         {
           text: '사이트',
@@ -94,14 +124,6 @@ export default {
           divider: true,
           align: 'center'
         },
-        // {
-        //   text: '이미지',
-        //   value: 'img',
-        //   sortable: false,
-        //   width: '75',
-        //   divider: false,
-        //   align: 'center'
-        // },
         {
           text: '딜',
           value: 'title',
@@ -126,6 +148,7 @@ export default {
   },
 
   mounted () {
+    this.loading = false
   },
 
   methods: {
