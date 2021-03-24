@@ -7,11 +7,12 @@
             cols="12"
           >
             <v-autocomplete
-              v-model="selectSites"
+              v-model="filters.name"
               :items="sites"
               item-text="name"
               item-value="code"
               label="사이트"
+              chips
               multiple
             />
           </v-col>
@@ -34,9 +35,9 @@
         tile
       >
         <v-data-table
-          items-per-page="30"
+          :items-per-page="30"
           :headers="headers"
-          :items="deals"
+          :items="filteredDeals"
           :search="search"
           class="elevation-1"
           @click:row="openDeal"
@@ -46,6 +47,7 @@
           </template>
         </v-data-table>
       </v-skeleton-loader>
+      <v-btn @click="test">test</v-btn>
     </v-card>
   </div>
 </template>
@@ -140,11 +142,21 @@ export default {
           align: 'center'
         }
       ],
-      deals: []
+      deals: [],
+      filters: {
+        name: []
+      }
     }
   },
 
   computed: {
+    filteredDeals () {
+      return this.deals.filter((deal) => {
+        return Object.keys(this.filters).every((filter) => {
+          return this.filters[filter].length < 1 || this.filters[filter].includes(deal[filter])
+        })
+      })
+    }
   },
 
   mounted () {
@@ -156,8 +168,9 @@ export default {
       window.open(data.link, '_blank')
     },
 
-    async test () {
-      await this.$axios.get('/api/parse')
+    test () {
+      // await this.$axios.get('/api/parse')
+      console.log(this.filters)
     }
   }
 }
