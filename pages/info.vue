@@ -7,7 +7,7 @@
       <v-card-text>
         <v-row>
           <v-col
-            cols="6"
+            cols="12"
           >
             <v-autocomplete
               v-model="filters.name"
@@ -15,12 +15,13 @@
               item-text="name"
               item-value="code"
               label="사이트"
-              small-chips
               multiple
+              small-chips
+              deletable-chips
             />
           </v-col>
           <v-col
-            cols="6"
+            cols="12"
           >
             <v-text-field
               v-model="search"
@@ -167,6 +168,7 @@ export default {
 
     if (!this.dealInterval) {
       this.dealInterval = setInterval(async () => {
+        console.log('client interaval')
         this.deals = await this.loadDeals()
       }, 60000)
     }
