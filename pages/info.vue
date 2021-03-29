@@ -1,10 +1,13 @@
 <template>
   <div>
-    <v-card class="mb-5" :disabled="loading">
+    <v-card
+      class="mb-5"
+      :disabled="loading"
+    >
       <v-card-text>
         <v-row>
           <v-col
-            cols="12"
+            cols="6"
           >
             <v-autocomplete
               v-model="filters.name"
@@ -12,12 +15,12 @@
               item-text="name"
               item-value="code"
               label="사이트"
-              chips
+              small-chips
               multiple
             />
           </v-col>
           <v-col
-            cols="12"
+            cols="6"
           >
             <v-text-field
               v-model="search"
@@ -47,7 +50,6 @@
           </template>
         </v-data-table>
       </v-skeleton-loader>
-      <v-btn @click="test">test</v-btn>
     </v-card>
   </div>
 </template>
@@ -145,7 +147,8 @@ export default {
       deals: [],
       filters: {
         name: []
-      }
+      },
+      dealInterval: null
     }
   },
 
@@ -161,9 +164,49 @@ export default {
 
   mounted () {
     this.loading = false
+
+    if (!this.dealInterval) {
+      this.dealInterval = setInterval(async () => {
+        this.deals = await this.loadDeals()
+      }, 60000)
+    }
   },
 
   methods: {
+    async loadDeals () {
+      this.loading = true
+
+      try {
+        const dealsData = await this.$axios.get('/api/load')
+
+        if (dealsData) {
+          this.deals = []
+
+          const resultArr = dealsData.data.reduce((acc, cur) => {
+            const remap = cur.data.map((item) => {
+              item.name = cur.name
+              item.label = cur.label
+              return item
+            })
+
+            return acc.concat(remap)
+          }, []).sort((a, b) => {
+            if (a.regDt > b.regDt) {
+              return -1
+            } else {
+              return 1
+            }
+          })
+
+          return resultArr
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        this.loading = false
+      }
+    },
+
     openDeal (data) {
       window.open(data.link, '_blank')
     },

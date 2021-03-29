@@ -18,11 +18,13 @@ const parse = async () => {
   console.log('parse end')
 }
 
-schedule.scheduleJob('*/1 * * * *', async () => {
-  console.log('스케쥴 시작')
-  await parse()
-  console.log('끝')
-})
+if (!schedule.scheduledJobs.parse) {
+  schedule.scheduleJob('parse', '*/1 * * * *', async () => {
+    console.log('스케쥴 시작')
+    await parse()
+    console.log('스케쥴 끝')
+  })
+}
 
 app.get('/parse', async (req, res, next) => {
   await parse()
@@ -41,7 +43,7 @@ app.get('/sites', (req, res, next) => {
       name: '뽐뿌-국내'
     },
     {
-      code: 'ppomppu-aboard',
+      code: 'ppomppu2',
       name: '뽐뿌-해외'
     },
     {
