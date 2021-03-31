@@ -7,7 +7,7 @@
     >
       <v-toolbar-title v-text="title" />
     </v-app-bar>
-    <v-main>
+    <v-main class="grey lighten-3">
       <v-container>
         <nuxt />
       </v-container>
