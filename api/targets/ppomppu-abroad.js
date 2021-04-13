@@ -55,11 +55,14 @@ export default class ppomppuAboard {
       const link = this.url + aEl.attr('href')
       // 시간 파싱
       const timeEl = cSelector(tdEl[4])
+      // 조회수 파싱
+      const view = cSelector(tdEl[6])
       returnArr.push({
         category,
         title,
         link,
         img: img.includes('noimage') ? null : img,
+        view: view.text(),
         regDt: this.convertDate(timeEl.attr('title'))
       })
     }

@@ -137,6 +137,14 @@ export default {
           divider: true
         },
         {
+          text: '조회수',
+          value: 'view',
+          sortable: false,
+          width: '100',
+          divider: true,
+          align: 'center'
+        },
+        {
           text: '등록일',
           value: 'regDt',
           sortable: false,
@@ -179,7 +187,7 @@ export default {
       this.loading = true
 
       try {
-        const dealsData = await this.$axios.get('/api/load')
+        const dealsData = await this.$axios.get('/api/load?page=1')
 
         if (dealsData) {
           this.deals = []

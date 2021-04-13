@@ -71,6 +71,7 @@ export default class parser {
     try {
       return await JSON.parse(fs.readFileSync(`${BASE_DIR}/${target.name}.json`, 'utf8'))
     } catch (e) {
+      console.error(e)
       console.error('파일이 없음: ', target.name)
     }
   }

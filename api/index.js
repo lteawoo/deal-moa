@@ -6,6 +6,8 @@ const app = express()
 
 export default app
 
+// let cacheDeals = null
+
 const parser = new Parser()
 
 const parse = async () => {
@@ -22,6 +24,8 @@ if (!schedule.scheduledJobs.parse) {
   schedule.scheduleJob('parse', '*/1 * * * *', async () => {
     console.log('스케쥴 시작')
     await parse()
+
+    // cacheDeals = await parser.loadFiles()
     console.log('스케쥴 끝')
   })
 }
@@ -32,7 +36,27 @@ app.get('/parse', async (req, res, next) => {
   res.send()
 })
 
+// const handlePage = (page, content) => {
+//   if (page && content && content.length > 1) {
+//     const PAGE_COUNT = 30
+//     const contentSize = content.length
+
+//     const startIndex = (page - 1) * PAGE_COUNT
+//     const endIndex = (contentSize < page * PAGE_COUNT) ? contentSize : page * PAGE_COUNT
+//     return content.slice(startIndex, endIndex)
+//   }
+// }
+
 app.get('/load', async (req, res, next) => {
+  // if (!cacheDeals) {
+  //   await parse()
+
+  //   cacheDeals = await parser.loadFiles()
+  // }
+
+  // const { page = 1 } = req.query
+  // const pagingContent = handlePage(page, cacheDeals)
+  // console.log(pagingContent)
   res.send(await parser.loadFiles())
 })
 
