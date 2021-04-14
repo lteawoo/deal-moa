@@ -62,6 +62,7 @@ export default class quasarzone {
 
       // 가격 파싱
       const price = cSelector(subEl).find('span:not([class*="category"])').first().children('span').text()
+      const view = cSelector(subEl).find('.count').text()
       // 시간 파싱
       const time = cSelector(subEl).find('.date').text().trim()
       returnArr.push({
@@ -69,6 +70,7 @@ export default class quasarzone {
         title: title + ' - ' + price.replace('￦', '').replace('(KRW)', '원').trim(),
         link,
         img,
+        view,
         regDt: this.convertDate(time)
       })
     }

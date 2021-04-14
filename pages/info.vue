@@ -46,6 +46,9 @@
           class="elevation-1"
           @click:row="openDeal"
         >
+          <template #[`item.view`]="{ item }">
+            {{ item.view | numberComma }}
+          </template>
           <template #[`item.regDt`]="{ item }">
             <display-time :time="item.regDt" />
           </template>
@@ -66,7 +69,7 @@ export default {
 
   filters: {
     numberComma (val) {
-      return String(val).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      return val ? String(val).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''
     },
 
     localeDateTime (dt) {
