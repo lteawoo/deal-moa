@@ -46,15 +46,19 @@ export default class quasarzone {
 
       const tdEl = dealEl.children('td')[1]
 
+      const mainEl = cSelector(tdEl).find('p.tit')
+      const aEl = cSelector(mainEl).find('a')
+      const link = this.url + cSelector(aEl).attr('href')
+
+      // 딜마다 조회하여 정보 파싱처리
+      const dealPage = await browser.newPage()
+      this.parsePage(dealPage, link)
+
       // 이미지
       const img = cSelector(tdEl).find('.thumb-wrap img').attr('src')
 
-      const mainEl = cSelector(tdEl).find('p.tit')
       // 타이틀
-      const aEl = cSelector(mainEl).find('a')
       const title = cSelector(aEl).children('span').first().text()
-
-      const link = this.url + cSelector(aEl).attr('href')
 
       const subEl = cSelector(tdEl).find('.market-info-sub')
       // 카테고리 파싱
@@ -82,6 +86,34 @@ export default class quasarzone {
       label: this.label,
       data: returnArr
     }
+  }
+
+  async parsePage (page, link) {
+    await page.setRequestInterception(true)
+
+    page.on('request', (req) => {
+      switch (req.resourceType()) {
+        case 'stylesheet':
+        case 'font':
+        case 'image':
+          req.abort()
+          break
+        default:
+          req.continue()
+          break
+      }
+    })
+
+    const pageContent = await page.content()
+    const cSelector = cheerio.load(pageContent)
+
+    const dealPageEl = cSelector('.common-view-area')
+
+    const header = cSelector(dealPageEl).find('dt')
+
+    console.log(header.text())
+
+    page.close()
   }
 
   convertDate (pDate) {
