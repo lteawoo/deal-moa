@@ -46,6 +46,9 @@
           class="elevation-1"
           @click:row="openDeal"
         >
+          <template #[`item.reply`]="{ item }">
+            {{ item.reply | numberComma }}
+          </template>
           <template #[`item.view`]="{ item }">
             {{ item.view | numberComma }}
           </template>
@@ -140,6 +143,22 @@ export default {
           divider: true
         },
         {
+          text: '가격',
+          value: 'price',
+          sortable: false,
+          width: '150',
+          divider: true,
+          align: 'center'
+        },
+        {
+          text: '댓글',
+          value: 'reply',
+          sortable: false,
+          width: '100',
+          divider: true,
+          align: 'center'
+        },
+        {
           text: '조회수',
           value: 'view',
           sortable: false,
@@ -199,6 +218,7 @@ export default {
             const remap = cur.data.map((item) => {
               item.name = cur.name
               item.label = cur.label
+              item.title = (!item.price) ? item.title : item.title + ' - ' + item.price
               return item
             })
 

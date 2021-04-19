@@ -52,30 +52,32 @@ export default class quasarzone {
 
       // 딜마다 조회하여 정보 파싱처리
       const dealPage = await browser.newPage()
-      this.parsePage(dealPage, link)
+      const dealInfo = await this.parsePage(dealPage, link)
 
       // 이미지
       const img = cSelector(tdEl).find('.thumb-wrap img').attr('src')
 
       // 타이틀
-      const title = cSelector(aEl).children('span').first().text()
+      // const title = cSelector(aEl).children('span').first().text()
 
-      const subEl = cSelector(tdEl).find('.market-info-sub')
+      // const subEl = cSelector(tdEl).find('.market-info-sub')
       // 카테고리 파싱
-      const category = cSelector(subEl).find('.category').text()
+      // const category = cSelector(subEl).find('.category').text()
 
       // 가격 파싱
-      const price = cSelector(subEl).find('span:not([class*="category"])').first().children('span').text()
-      const view = cSelector(subEl).find('.count').text()
+      // const price = cSelector(subEl).find('span:not([class*="category"])').first().children('span').text()
+      // const view = cSelector(subEl).find('.count').text()
       // 시간 파싱
-      const time = cSelector(subEl).find('.date').text().trim()
+      // const time = cSelector(subEl).find('.date').text().trim()
       returnArr.push({
-        category,
-        title: title + ' - ' + price.replace('￦', '').replace('(KRW)', '원').trim(),
+        category: dealInfo.category,
+        title: dealInfo.title,
+        price: dealInfo.price,
         link,
         img,
-        view,
-        regDt: this.convertDate(time)
+        view: dealInfo.view,
+        reply: dealInfo.reply,
+        regDt: this.convertDate(dealInfo.time)
       })
     }
 
@@ -104,30 +106,61 @@ export default class quasarzone {
       }
     })
 
+    page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+
+    page.waitForSelector('.market-type-list')
+
+    await page.goto(link, {
+      waitUntil: 'domcontentloaded'
+    })
+
     const pageContent = await page.content()
     const cSelector = cheerio.load(pageContent)
 
     const dealPageEl = cSelector('.common-view-area')
+    const titleEl = cSelector(dealPageEl).find('.title')
+    titleEl.children().remove()
+    const title = titleEl.text().trim()
 
-    const header = cSelector(dealPageEl).find('dt')
+    const utilAreaEl = cSelector(dealPageEl).find('.util-area')
+    const category = cSelector(utilAreaEl).find('.ca_name').text().trim()
+    const reply = cSelector(utilAreaEl).find('.count .reply').text().trim()
+    const view = cSelector(utilAreaEl).find('.count .view').text().trim()
+    const time = cSelector(utilAreaEl).find('.date').text().trim()
 
-    console.log(header.text())
+    const marketInfoEl = cSelector(dealPageEl).find('.market-info-view-table')
+    const trEl = cSelector(marketInfoEl).find('tbody tr')
+    const price = this.convertPrice(cSelector(trEl[2]).find('td span').text())
 
-    page.close()
+    await page.close()
+
+    return {
+      title,
+      category,
+      reply,
+      view,
+      time,
+      price
+    }
+  }
+
+  convertPrice (pPrice) {
+    return pPrice.replace('(KRW)', '원').replace('(USD)', '달러').trim()
   }
 
   convertDate (pDate) {
-    const first = pDate.substr(0, 2)
-    const second = pDate.substr(3, 2)
-    const date = new Date()
-    if (pDate.includes(':')) {
-      date.setHours(first)
-      date.setMinutes(second)
-      return date
-    } else {
-      date.setMonth(first - 1)
-      date.setSeconds(second)
-      return date
-    }
+    // const first = pDate.substr(0, 2)
+    // const second = pDate.substr(3, 2)
+    // const date = new Date()
+    // if (pDate.includes(':')) {
+    //   date.setHours(first)
+    //   date.setMinutes(second)
+    //   return date
+    // } else {
+    //   date.setMonth(first - 1)
+    //   date.setSeconds(second)
+    //   return date
+    // }
+    return new Date(pDate)
   }
 }
