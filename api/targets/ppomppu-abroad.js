@@ -11,7 +11,6 @@ export default class ppomppuAboard {
   async parse (browser) {
     const page = await browser.newPage()
     await page.setRequestInterception(true)
-
     page.on('request', (req) => {
       switch (req.resourceType()) {
         case 'stylesheet':
@@ -24,11 +23,25 @@ export default class ppomppuAboard {
           break
       }
     })
-
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+    page.on('domcontentloaded', () => console.log('뽐뿌-해외 파싱완료'))
 
-    page.waitForSelector('#revolution_main_table')
-      .then(() => console.log('뽐뿌-해외 파싱완료'))
+    const dealPage = await browser.newPage()
+    await dealPage.setRequestInterception(true)
+    dealPage.on('request', (req) => {
+      switch (req.resourceType()) {
+        case 'stylesheet':
+        case 'font':
+        case 'image':
+          req.abort()
+          break
+        default:
+          req.continue()
+          break
+      }
+    })
+    dealPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+    dealPage.on('domcontentloaded', () => console.log('뽐뿌-해외 딜 파싱완료'))
 
     await page.goto(this.url + this.path, {
       waitUntil: 'domcontentloaded'
@@ -45,28 +58,31 @@ export default class ppomppuAboard {
       const dealEl = cSelector(dealListEl[i])
 
       const tdEl = dealEl.children('td')
-      // 카테고리 파싱
-      const category = cSelector(tdEl[1]).text()
+
       // 이미지/제목/링크 파싱
       const contentEl = tdEl.find('table')
       const aEl = contentEl.find('a')
-      const title = cSelector(aEl[1]).text()
       const img = cSelector(aEl[0]).find('img').attr('src')
       const link = this.url + aEl.attr('href')
+
+      const dealInfo = await this.parsePage(dealPage, link)
+
       // 시간 파싱
-      const timeEl = cSelector(tdEl[4])
+      // const timeEl = cSelector(tdEl[4])
       // 조회수 파싱
-      const view = cSelector(tdEl[6])
+      // const view = cSelector(tdEl[6])
       returnArr.push({
-        category,
-        title,
+        category: dealInfo.category,
+        title: dealInfo.title,
         link,
         img: img.includes('noimage') ? null : img,
-        view: view.text(),
-        regDt: this.convertDate(timeEl.attr('title'))
+        view: dealInfo.view,
+        reply: dealInfo.reply,
+        regDt: this.convertDate(dealInfo.time)
       })
     }
 
+    await dealPage.close()
     await page.close()
 
     return {
@@ -76,15 +92,41 @@ export default class ppomppuAboard {
     }
   }
 
+  async parsePage (page, link) {
+    await page.goto(link, {
+      waitUntil: 'domcontentloaded'
+    })
+
+    const pageContent = await page.content()
+    const cSelector = cheerio.load(pageContent)
+
+    const headerEl = cSelector('.container table.info_bg .sub-top-text-box')
+    const title = cSelector(headerEl).find('.view_title2').text().trim()
+    const category = cSelector(headerEl).find('.view_cate').text().trim()
+
+    const headerElSplit = cSelector(headerEl).text().split('\n')
+    const regDtEl = headerElSplit.filter(el => el.includes('등록일'))[0]
+    const regDt = regDtEl.substring(regDtEl.indexOf(':') + 1).trim()
+    let viewReplyEl = headerElSplit.filter(el => el.includes('조회수'))[0]
+    let view = null
+    let reply = null
+    if (viewReplyEl) {
+      viewReplyEl = viewReplyEl.split('/')
+      view = viewReplyEl[0].replace(/[^\d]/g, '').trim()
+      reply = viewReplyEl[1].replace(/[^\d]/g, '').trim()
+    }
+
+    return {
+      title,
+      category,
+      reply,
+      view,
+      time: regDt,
+      price: 0
+    }
+  }
+
   convertDate (pDate) {
-    const yy = pDate.substr(0, 2)
-    const mm = pDate.substr(3, 2)
-    const dd = pDate.substr(6, 2)
-    const HH = pDate.substr(9, 2)
-    const MM = pDate.substr(12, 2)
-    const ss = pDate.substr(15, 2)
-    const yyyy = (yy < 60) ? '20' + yy : '19'
-    const resultDate = new Date(`${yyyy}-${mm}-${dd}T${HH}:${MM}:${ss}`)
-    return resultDate
+    return new Date(pDate)
   }
 }

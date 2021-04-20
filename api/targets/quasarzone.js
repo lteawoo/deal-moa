@@ -11,7 +11,6 @@ export default class quasarzone {
   async parse (browser) {
     const page = await browser.newPage()
     await page.setRequestInterception(true)
-
     page.on('request', (req) => {
       switch (req.resourceType()) {
         case 'stylesheet':
@@ -24,11 +23,33 @@ export default class quasarzone {
           break
       }
     })
-
     page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+    // page.waitForSelector('.market-type-list')
+    //   .then(() => console.log('퀘이사존 파싱완료'))
+    page.on('domcontentloaded', () => console.log('퀘이사존 파싱완료'))
 
-    page.waitForSelector('.market-type-list')
-      .then(() => console.log('퀘이사존 파싱완료'))
+    const dealPage = await browser.newPage()
+    await dealPage.setRequestInterception(true)
+    dealPage.on('request', (req) => {
+      switch (req.resourceType()) {
+        case 'stylesheet':
+        case 'font':
+        case 'image':
+          req.abort()
+          break
+        default:
+          req.continue()
+          break
+      }
+    })
+    dealPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+    dealPage.on('domcontentloaded', () => console.log('퀘이사존 딜 파싱완료'))
+    dealPage.on('dialog', async (dialog) => {
+      console.log(dialog.message())
+      await dialog.accept()
+    })
+    // dealPage.waitForSelector('.common-view-area')
+    //   .then(() => console.log('퀘이사존 딜페이지완료'))
 
     await page.goto(this.url + this.path, {
       waitUntil: 'domcontentloaded'
@@ -51,24 +72,17 @@ export default class quasarzone {
       const link = this.url + cSelector(aEl).attr('href')
 
       // 딜마다 조회하여 정보 파싱처리
-      const dealPage = await browser.newPage()
-      const dealInfo = await this.parsePage(dealPage, link)
+      let dealInfo = null
+      try {
+        dealInfo = await this.parsePage(dealPage, link)
+      } catch (e) {
+        console.error('에러 아마 블라인드', e)
+        continue
+      }
 
       // 이미지
       const img = cSelector(tdEl).find('.thumb-wrap img').attr('src')
 
-      // 타이틀
-      // const title = cSelector(aEl).children('span').first().text()
-
-      // const subEl = cSelector(tdEl).find('.market-info-sub')
-      // 카테고리 파싱
-      // const category = cSelector(subEl).find('.category').text()
-
-      // 가격 파싱
-      // const price = cSelector(subEl).find('span:not([class*="category"])').first().children('span').text()
-      // const view = cSelector(subEl).find('.count').text()
-      // 시간 파싱
-      // const time = cSelector(subEl).find('.date').text().trim()
       returnArr.push({
         category: dealInfo.category,
         title: dealInfo.title,
@@ -81,6 +95,7 @@ export default class quasarzone {
       })
     }
 
+    await dealPage.close()
     await page.close()
 
     return {
@@ -91,25 +106,6 @@ export default class quasarzone {
   }
 
   async parsePage (page, link) {
-    await page.setRequestInterception(true)
-
-    page.on('request', (req) => {
-      switch (req.resourceType()) {
-        case 'stylesheet':
-        case 'font':
-        case 'image':
-          req.abort()
-          break
-        default:
-          req.continue()
-          break
-      }
-    })
-
-    page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
-
-    page.waitForSelector('.market-type-list')
-
     await page.goto(link, {
       waitUntil: 'domcontentloaded'
     })
@@ -132,8 +128,6 @@ export default class quasarzone {
     const trEl = cSelector(marketInfoEl).find('tbody tr')
     const price = this.convertPrice(cSelector(trEl[2]).find('td span').text())
 
-    await page.close()
-
     return {
       title,
       category,
@@ -149,18 +143,6 @@ export default class quasarzone {
   }
 
   convertDate (pDate) {
-    // const first = pDate.substr(0, 2)
-    // const second = pDate.substr(3, 2)
-    // const date = new Date()
-    // if (pDate.includes(':')) {
-    //   date.setHours(first)
-    //   date.setMinutes(second)
-    //   return date
-    // } else {
-    //   date.setMonth(first - 1)
-    //   date.setSeconds(second)
-    //   return date
-    // }
     return new Date(pDate)
   }
 }
