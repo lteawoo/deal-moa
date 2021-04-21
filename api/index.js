@@ -20,15 +20,15 @@ const parse = async () => {
   console.log('parse end')
 }
 
-// if (!schedule.scheduledJobs.parse) {
-//   schedule.scheduleJob('parse', '*/1 * * * *', async () => {
-//     console.log('스케쥴 시작')
-//     await parse()
+if (!schedule.scheduledJobs.parse) {
+  schedule.scheduleJob('parse', '*/1 * * * *', async () => {
+    console.log('스케쥴 시작')
+    await parse()
 
-//     // cacheDeals = await parser.loadFiles()
-//     console.log('스케쥴 끝')
-//   })
-// }
+    // cacheDeals = await parser.loadFiles()
+    console.log('스케쥴 끝')
+  })
+}
 
 app.get('/parse', async (req, res, next) => {
   await parse()
