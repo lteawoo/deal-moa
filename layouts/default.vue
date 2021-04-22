@@ -32,7 +32,7 @@ export default {
         {
           icon: 'mdi-information',
           title: 'Info',
-          to: '/info'
+          to: '/'
         }
       ],
       miniVariant: false,

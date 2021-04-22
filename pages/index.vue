@@ -1,89 +1,253 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
+  <div>
+    <v-card
+      class="mb-5"
+      :disabled="loading"
+    >
+      <v-card-text>
+        <v-row>
+          <v-col
+            cols="12"
           >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
+            <v-autocomplete
+              v-model="filters.name"
+              :items="sites"
+              item-text="name"
+              item-value="code"
+              label="사이트"
+              multiple
+              small-chips
+              deletable-chips
+            />
+          </v-col>
+          <v-col
+            cols="12"
           >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+            <v-text-field
+              v-model="search"
+              label="검색"
+            />
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+
+    <v-card>
+      <v-skeleton-loader
+        :loading="loading"
+        type="table"
+        tile
+      >
+        <v-data-table
+          :items-per-page="30"
+          :headers="headers"
+          :items="filteredDeals"
+          :search="search"
+          class="elevation-1"
+          @click:row="openDeal"
+        >
+          <template #[`item.reply`]="{ item }">
+            {{ item.reply | numberComma }}
+          </template>
+          <template #[`item.view`]="{ item }">
+            {{ item.view | numberComma }}
+          </template>
+          <template #[`item.regDt`]="{ item }">
+            <display-time :time="item.regDt" />
+          </template>
+        </v-data-table>
+      </v-skeleton-loader>
+    </v-card>
+  </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
+import dateformat from 'dateformat'
+import displayTime from '@/components/display-time'
 
 export default {
   components: {
-    Logo,
-    VuetifyLogo
+    displayTime
+  },
+
+  filters: {
+    numberComma (val) {
+      return val ? String(val).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''
+    },
+
+    localeDateTime (dt) {
+      return dateformat(dt, 'yyyy-mm-dd HH:MM:ss')
+    }
+  },
+
+  async asyncData ({ $axios }) {
+    const result = {}
+
+    const dealsData = await $axios.get('/api/load')
+    if (dealsData) {
+      const resultArr = dealsData.data.reduce((acc, cur) => {
+        const remap = cur.data.map((item) => {
+          item.name = cur.name
+          item.label = cur.label
+          return item
+        })
+
+        return acc.concat(remap)
+      }, []).sort((a, b) => {
+        if (a.regDt > b.regDt) {
+          return -1
+        } else {
+          return 1
+        }
+      })
+
+      result.deals = resultArr
+    }
+
+    const sitesData = await $axios.get('/api/sites')
+    if (sitesData) {
+      result.sites = sitesData.data
+    }
+
+    return result
+  },
+
+  data () {
+    return {
+      loading: true,
+      search: '',
+      sites: [],
+      selectSites: null,
+      headers: [
+        {
+          text: '사이트',
+          value: 'label',
+          sortable: false,
+          width: '100',
+          divider: true,
+          align: 'center'
+        },
+        {
+          text: '분류',
+          value: 'category',
+          sortable: false,
+          width: '120',
+          divider: true,
+          align: 'center'
+        },
+        {
+          text: '딜',
+          value: 'title',
+          sortable: false,
+          width: '100%',
+          divider: true
+        },
+        {
+          text: '가격',
+          value: 'price',
+          sortable: false,
+          width: '150',
+          divider: true,
+          align: 'center'
+        },
+        {
+          text: '댓글',
+          value: 'reply',
+          sortable: false,
+          width: '100',
+          divider: true,
+          align: 'center'
+        },
+        {
+          text: '조회수',
+          value: 'view',
+          sortable: false,
+          width: '100',
+          divider: true,
+          align: 'center'
+        },
+        {
+          text: '등록일',
+          value: 'regDt',
+          sortable: false,
+          width: '100',
+          divider: true,
+          align: 'center'
+        }
+      ],
+      deals: [],
+      filters: {
+        name: []
+      },
+      dealInterval: null
+    }
+  },
+
+  computed: {
+    filteredDeals () {
+      return this.deals.filter((deal) => {
+        return Object.keys(this.filters).every((filter) => {
+          return this.filters[filter].length < 1 || this.filters[filter].includes(deal[filter])
+        })
+      })
+    }
+  },
+
+  mounted () {
+    this.loading = false
+
+    if (!this.dealInterval) {
+      this.dealInterval = setInterval(async () => {
+        console.log('client interaval')
+        this.deals = await this.loadDeals()
+      }, 60000)
+    }
+  },
+
+  methods: {
+    async loadDeals () {
+      this.loading = true
+
+      try {
+        const dealsData = await this.$axios.get('/api/load?page=1')
+
+        if (dealsData) {
+          this.deals = []
+
+          const resultArr = dealsData.data.reduce((acc, cur) => {
+            const remap = cur.data.map((item) => {
+              item.name = cur.name
+              item.label = cur.label
+              item.title = (!item.price) ? item.title : item.title + ' - ' + item.price
+              return item
+            })
+
+            return acc.concat(remap)
+          }, []).sort((a, b) => {
+            if (a.regDt > b.regDt) {
+              return -1
+            } else {
+              return 1
+            }
+          })
+
+          return resultArr
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    openDeal (data) {
+      window.open(data.link, '_blank')
+    },
+
+    test () {
+      // await this.$axios.get('/api/parse')
+      console.log(this.filters)
+    }
   }
 }
 </script>
